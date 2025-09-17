@@ -1,0 +1,54 @@
+# open evcc at http://evcc.local:7070
+network:
+  schema: http
+  host: evcc.local # .local suffix announces the hostname on MDNS
+  port: 7070
+
+log: debug
+levels:
+  cache: error
+
+# unique installation id
+plant: f01c545d3a03005bdedee6316d8d52fe267b74a93b4d3ad421088a4265f81e33
+
+interval: 30s # control cycle interval
+sponsortoken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJldmNjLmlvIiwic3ViIjoidHJpYWwiLCJleHAiOjE3NTgxODk2MDAsImlhdCI6MTc1NzMyNTYwMCwic3BlIjp0cnVlLCJzcmMiOiJtYSJ9.qd_FDzFGoL65akmC8hd44_sYjHEchp1sZfrkQmPcjho
+
+meters:
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: 192.168.178.62  
+  port: 1502  
+  usage: grid  
+  modbus: tcpip  
+  timeout: 10s  
+  name: grid1
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: 192.168.178.62  
+  port: 1502  
+  usage: pv  
+  modbus: tcpip  
+  timeout: 10s  
+  name: pv2
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: 192.168.178.62  
+  port: 1502  
+  usage: battery  
+  modbus: tcpip  
+  timeout: 10s  
+  name: battery3
+
+site:
+  title: Mein Zuhause
+  meters:
+    grid: grid1
+    pv:
+    - pv2
+    battery:
+    - battery3
+
