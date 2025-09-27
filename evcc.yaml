@@ -1,0 +1,96 @@
+network:
+  schema: http
+  host: evcc.local
+  port: 7070
+
+log: debug
+levels:
+  cache: error
+
+# unique installation id
+plant: f01c545d3a03005bdedee6316d8d52fe267b74a93b4d3ad421088a4265f81e33
+interval: 30s
+sponsortoken: $todo_evcc_sponsor_token
+
+tariffs:
+  currency: EUR
+  grid: # Preis für Netzbezug
+    type: fixed
+    price: $todo_netzbezug # EUR/kWh
+  feedin: # Einspeisevergütung
+    type: fixed
+    price: $todo_einspeisevergütung # EUR/kWh
+
+influx:
+  url: http://influxdb:8086
+  database: evcc
+  token: $todo_influx_token
+  org: evcc
+  insecure: true
+
+chargers:
+- name: wallbox
+  type: template
+  template: go-e-v3
+  host: $todo_wallbox_host
+
+mqtt:
+  broker: mqtt:1883
+  topic: evcc
+  insecure: true
+  clientId: evcc
+
+vehicles:
+- name: modely
+  type: template
+  template: tesla
+  title: Der Dässla
+  capacity: $todo_capacity
+  clientId: $todo_teslamate_client_id
+  accessToken: $todo_teslamate_access_token
+  refreshToken: todo_teslamate_refresh_token
+
+loadpoints:
+- title: Stellplatz
+  charger: wallbox
+  vehicle: modely
+  mode: pv
+
+meters:
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: $todo_wechselrichter_ip (modbus)  
+  port: 1502  # Defaultport
+  usage: grid  
+  modbus: tcpip  
+  timeout: 10s  
+  name: grid
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: $todo_wechselrichter_ip (modbus)
+  port: 1502  # Defaultport
+  usage: pv  
+  modbus: tcpip  
+  timeout: 10s  
+  name: pv
+- type: template
+  template: solaredge-hybrid 
+  id: 1  
+  host: $todo_wechselrichter_ip (modbus)
+  port: 1502  
+  usage: battery  
+  modbus: tcpip  
+  timeout: 10s  
+  name: battery
+
+site:
+  title: Mein Zuhause
+  meters:
+    grid: grid
+    pv:
+    - pv
+    battery:
+    - battery
+

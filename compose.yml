@@ -1,0 +1,67 @@
+volumes:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:
+  mqtt_data:
+  mqtt_log:
+  evcc_data:
+
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt
+    ports:
+      - "9100:1883"     # MQTT Port
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt_data:/mosquitto/data
+      - mqtt_log:/mosquitto/log
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "9110:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=$todo_influx_username
+      - DOCKER_INFLUXDB_INIT_PASSWORD=stodo_influx_password
+      - DOCKER_INFLUXDB_INIT_ORG=evcc
+      - DOCKER_INFLUXDB_INIT_BUCKET=evcc
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$todo_influx_token
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "9120:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=$todo_grafana_username
+      - GF_SECURITY_ADMIN_PASSWORD=$todo_grafana_password
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - influxdb
+  evcc:
+    command:
+      - evcc
+    container_name: evcc
+    image: evcc/evcc:latest
+    ports:
+      - 9130:7070/tcp  # User Interface
+      - 9131:8887/tcp  # Port für Websockets (bspw MQTT)
+    volumes:
+      - ./evcc.yaml:/etc/evcc.yaml
+      - evcc_data:/root/.evcc
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+      - mqtt
