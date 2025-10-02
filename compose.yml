@@ -45,8 +45,10 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
     environment:
-      - GF_SECURITY_ADMIN_USER=$todo_grafana_username
-      - GF_SECURITY_ADMIN_PASSWORD=$todo_grafana_password
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_USERS_ALLOW_SIGN_UP=false
     depends_on:
       - influxdb
